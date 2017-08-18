@@ -28,7 +28,7 @@ for article in articles:
 
       has_bigshot = False
       for i in range(1, len(authors)):
-         if(authors[i].strip() in bigshot or authors[i] in familiar):
+         if(authors[i].strip() in bigshot or authors[i].strip() in familiar):
             has_bigshot = True
             name += '&' + authors[i].split()[-1]
       if not has_bigshot:
