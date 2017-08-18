@@ -1,0 +1,23 @@
+\begin{thebibliography}{2}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Dai et~al.(2017)Dai, Yang, Yang, Cohen, and
+  Salakhutdinov]{DBLP:journals/corr/DaiYYCS17}
+Zihang Dai, Zhilin Yang, Fan Yang, William~W. Cohen, and Ruslan Salakhutdinov.
+\newblock Good semi-supervised learning that requires a bad {GAN}.
+\newblock \emph{CoRR}, abs/1705.09783, 2017.
+\newblock URL \url{http://arxiv.org/abs/1705.09783}.
+
+\bibitem[Salimans et~al.(2017)Salimans, Karpathy, Chen, and
+  Kingma]{DBLP:journals/corr/SalimansKCK17}
+Tim Salimans, Andrej Karpathy, Xi~Chen, and Diederik~P. Kingma.
+\newblock Pixelcnn++: Improving the pixelcnn with discretized logistic mixture
+  likelihood and other modifications.
+\newblock \emph{CoRR}, abs/1701.05517, 2017.
+\newblock URL \url{http://arxiv.org/abs/1701.05517}.
+
+\end{thebibliography}

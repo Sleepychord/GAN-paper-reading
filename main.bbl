@@ -1,0 +1,289 @@
+\begin{thebibliography}{40}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Arjovsky and Bottou(2017)]{DBLP:journals/corr/ArjovskyB17}
+Mart{\'{\i}}n Arjovsky and L{\'{e}}on Bottou.
+\newblock Towards principled methods for training generative adversarial
+  networks.
+\newblock \emph{CoRR}, abs/1701.04862, 2017.
+\newblock URL \url{http://arxiv.org/abs/1701.04862}.
+
+\bibitem[Arjovsky et~al.(2017)Arjovsky, Chintala, and
+  Bottou]{DBLP:journals/corr/ArjovskyCB17}
+Mart{\'{\i}}n Arjovsky, Soumith Chintala, and L{\'{e}}on Bottou.
+\newblock Wasserstein {GAN}.
+\newblock \emph{CoRR}, abs/1701.07875, 2017.
+\newblock URL \url{http://arxiv.org/abs/1701.07875}.
+
+\bibitem[Arora and Zhang(2017)]{DBLP:journals/corr/AroraZ17}
+Sanjeev Arora and Yi~Zhang.
+\newblock Do gans actually learn the distribution? an empirical study.
+\newblock \emph{CoRR}, abs/1706.08224, 2017.
+\newblock URL \url{http://arxiv.org/abs/1706.08224}.
+
+\bibitem[Benaim and Wolf(2017)]{DBLP:journals/corr/BenaimW17}
+Sagie Benaim and Lior Wolf.
+\newblock One-sided unsupervised domain mapping.
+\newblock \emph{CoRR}, abs/1706.00826, 2017.
+\newblock URL \url{http://arxiv.org/abs/1706.00826}.
+
+\bibitem[Berthelot et~al.(2017)Berthelot, Schumm, and
+  Metz]{DBLP:journals/corr/BerthelotSM17}
+David Berthelot, Tom Schumm, and Luke Metz.
+\newblock {BEGAN:} boundary equilibrium generative adversarial networks.
+\newblock \emph{CoRR}, abs/1703.10717, 2017.
+\newblock URL \url{http://arxiv.org/abs/1703.10717}.
+
+\bibitem[Chen and Koltun(2017)]{chen2017photographic}
+Qifeng Chen and Vladlen Koltun.
+\newblock Photographic image synthesis with cascaded refinement networks.
+\newblock \emph{arXiv preprint arXiv:1707.09405}, 2017.
+
+\bibitem[Chen et~al.(2016)Chen, Duan, Houthooft, Schulman, Sutskever, and
+  Abbeel]{DBLP:journals/corr/ChenDHSSA16}
+Xi~Chen, Yan Duan, Rein Houthooft, John Schulman, Ilya Sutskever, and Pieter
+  Abbeel.
+\newblock Infogan: Interpretable representation learning by information
+  maximizing generative adversarial nets.
+\newblock \emph{CoRR}, abs/1606.03657, 2016.
+\newblock URL \url{http://arxiv.org/abs/1606.03657}.
+
+\bibitem[Chidambaram and Qi(2017)]{DBLP:journals/corr/ChidambaramQ17}
+Muthuraman Chidambaram and Yanjun Qi.
+\newblock Style transfer generative adversarial networks: Learning to play
+  chess differently.
+\newblock \emph{CoRR}, abs/1702.06762, 2017.
+\newblock URL \url{http://arxiv.org/abs/1702.06762}.
+
+\bibitem[Creswell and Bharath(2016)]{DBLP:journals/corr/CreswellB16}
+Antonia Creswell and Anil~Anthony Bharath.
+\newblock Adversarial training for sketch retrieval.
+\newblock \emph{CoRR}, abs/1607.02748, 2016.
+\newblock URL \url{http://arxiv.org/abs/1607.02748}.
+
+\bibitem[Dai et~al.(2017)Dai, Yang, Yang, Cohen, and
+  Salakhutdinov]{DBLP:journals/corr/DaiYYCS17}
+Zihang Dai, Zhilin Yang, Fan Yang, William~W. Cohen, and Ruslan Salakhutdinov.
+\newblock Good semi-supervised learning that requires a bad {GAN}.
+\newblock \emph{CoRR}, abs/1705.09783, 2017.
+\newblock URL \url{http://arxiv.org/abs/1705.09783}.
+
+\bibitem[Denton et~al.(2015)Denton, Chintala, Szlam, and
+  Fergus]{DBLP:journals/corr/DentonCSF15}
+Emily~L. Denton, Soumith Chintala, Arthur Szlam, and Robert Fergus.
+\newblock Deep generative image models using a laplacian pyramid of adversarial
+  networks.
+\newblock \emph{CoRR}, abs/1506.05751, 2015.
+\newblock URL \url{http://arxiv.org/abs/1506.05751}.
+
+\bibitem[Doersch(2016)]{vae_toturial}
+Carl Doersch.
+\newblock Tutorial on variational autoencoders.
+\newblock \emph{CoRR}, abs/1606.05908, 2016.
+\newblock URL \url{http://arxiv.org/abs/1606.05908}.
+
+\bibitem[Goodfellow(2017)]{gan_tutorial}
+Ian~J. Goodfellow.
+\newblock {NIPS} 2016 tutorial: Generative adversarial networks.
+\newblock \emph{CoRR}, abs/1701.00160, 2017.
+\newblock URL \url{http://arxiv.org/abs/1701.00160}.
+
+\bibitem[Goodfellow et~al.(2014)Goodfellow, Pouget{-}Abadie, Mirza, Xu,
+  Warde{-}Farley, Ozair, Courville, and Bengio]{gan}
+Ian~J. Goodfellow, Jean Pouget{-}Abadie, Mehdi Mirza, Bing Xu, David
+  Warde{-}Farley, Sherjil Ozair, Aaron~C. Courville, and Yoshua Bengio.
+\newblock Generative adversarial networks.
+\newblock \emph{CoRR}, abs/1406.2661, 2014.
+\newblock URL \url{http://arxiv.org/abs/1406.2661}.
+
+\bibitem[Graves(2013)]{DBLP:journals/corr/Graves13}
+Alex Graves.
+\newblock Generating sequences with recurrent neural networks.
+\newblock \emph{CoRR}, abs/1308.0850, 2013.
+\newblock URL \url{http://arxiv.org/abs/1308.0850}.
+
+\bibitem[Gulrajani et~al.(2017)Gulrajani, Ahmed, Arjovsky, Dumoulin, and
+  Courville]{DBLP:journals/corr/GulrajaniAADC17}
+Ishaan Gulrajani, Faruk Ahmed, Mart{\'{\i}}n Arjovsky, Vincent Dumoulin, and
+  Aaron~C. Courville.
+\newblock Improved training of wasserstein gans.
+\newblock \emph{CoRR}, abs/1704.00028, 2017.
+\newblock URL \url{http://arxiv.org/abs/1704.00028}.
+
+\bibitem[Im et~al.(2016)Im, Kim, Jiang, and Memisevic]{gran}
+Daniel~Jiwoong Im, Chris~Dongjoo Kim, Hui Jiang, and Roland Memisevic.
+\newblock Generating images with recurrent adversarial networks.
+\newblock \emph{CoRR}, abs/1602.05110, 2016.
+\newblock URL \url{https://arxiv.org/abs/1602.05110}.
+
+\bibitem[Isola et~al.(2016)Isola, Zhu, Zhou, and
+  Efros]{DBLP:journals/corr/IsolaZZE16}
+Phillip Isola, Jun{-}Yan Zhu, Tinghui Zhou, and Alexei~A. Efros.
+\newblock Image-to-image translation with conditional adversarial networks.
+\newblock \emph{CoRR}, abs/1611.07004, 2016.
+\newblock URL \url{http://arxiv.org/abs/1611.07004}.
+
+\bibitem[Kingma and Welling(2013)]{vae}
+Diederik~P. Kingma and Max Welling.
+\newblock Auto-encoding variational bayes.
+\newblock \emph{CoRR}, abs/1312.6114, 2013.
+\newblock URL \url{http://arxiv.org/abs/1312.6114}.
+
+\bibitem[Kwak and Zhang(2016)]{DBLP:journals/corr/KwakZ16}
+Hanock Kwak and Byoung{-}Tak Zhang.
+\newblock Generating images part by part with composite generative adversarial
+  networks.
+\newblock \emph{CoRR}, abs/1607.05387, 2016.
+\newblock URL \url{http://arxiv.org/abs/1607.05387}.
+
+\bibitem[Ledig et~al.(2016)Ledig, Theis, Huszar, Caballero, Aitken, Tejani,
+  Totz, Wang, and Shi]{DBLP:journals/corr/LedigTHCATTWS16}
+Christian Ledig, Lucas Theis, Ferenc Huszar, Jose Caballero, Andrew~P. Aitken,
+  Alykhan Tejani, Johannes Totz, Zehan Wang, and Wenzhe Shi.
+\newblock Photo-realistic single image super-resolution using a generative
+  adversarial network.
+\newblock \emph{CoRR}, abs/1609.04802, 2016.
+\newblock URL \url{http://arxiv.org/abs/1609.04802}.
+
+\bibitem[Li et~al.(2017)Li, Xu, Zhu, and Zhang]{DBLP:journals/corr/LiXZZ17}
+Chongxuan Li, Kun Xu, Jun Zhu, and Bo~Zhang.
+\newblock Triple generative adversarial nets.
+\newblock \emph{CoRR}, abs/1703.02291, 2017.
+\newblock URL \url{http://arxiv.org/abs/1703.02291}.
+
+\bibitem[Liang et~al.(2017)Liang, Zhang, and Xing]{semantic_replace}
+Xiaodan Liang, Hao Zhang, and Eric~P. Xing.
+\newblock Generative semantic manipulation with contrasting gan.
+\newblock \emph{CoRR}, abs/1708.00315, 2017.
+\newblock URL \url{https://arxiv.org/abs/1708.00315}.
+
+\bibitem[Mnih et~al.(2013)Mnih, Kavukcuoglu, Silver, Graves, Antonoglou,
+  Wierstra, and Riedmiller]{DBLP:journals/corr/MnihKSGAWR13}
+Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis
+  Antonoglou, Daan Wierstra, and Martin~A. Riedmiller.
+\newblock Playing atari with deep reinforcement learning.
+\newblock \emph{CoRR}, abs/1312.5602, 2013.
+\newblock URL \url{http://arxiv.org/abs/1312.5602}.
+
+\bibitem[Mnih et~al.(2015)Mnih, Kavukcuoglu, Silver, Rusu, Veness, Bellemare,
+  Graves, Riedmiller, Fidjeland, and Ostrovski]{Mnih2015Human}
+Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei~A. Rusu, Joel Veness,
+  Marc~G. Bellemare, Alex Graves, Martin Riedmiller, Andreas~K. Fidjeland, and
+  Georg Ostrovski.
+\newblock Human-level control through deep reinforcement learning.
+\newblock \emph{Nature}, 518\penalty0 (7540):\penalty0 529, 2015.
+
+\bibitem[Odena(2016)]{DBLP:journals/corr/Odena16a}
+Augustus Odena.
+\newblock Semi-supervised learning with generative adversarial networks.
+\newblock \emph{CoRR}, abs/1606.01583, 2016.
+\newblock URL \url{http://arxiv.org/abs/1606.01583}.
+
+\bibitem[Odena et~al.(2016)Odena, Olah, and
+  Shlens]{DBLP:journals/corr/OdenaOS16}
+Augustus Odena, Christopher Olah, and Jonathon Shlens.
+\newblock Conditional image synthesis with auxiliary classifier gans.
+\newblock \emph{CoRR}, abs/1610.09585, 2016.
+\newblock URL \url{http://arxiv.org/abs/1610.09585}.
+
+\bibitem[Pascual et~al.(2017)Pascual, Bonafonte, and
+  Serr{\`{a}}]{DBLP:journals/corr/PascualBS17}
+Santiago Pascual, Antonio Bonafonte, and Joan Serr{\`{a}}.
+\newblock {SEGAN:} speech enhancement generative adversarial network.
+\newblock \emph{CoRR}, abs/1703.09452, 2017.
+\newblock URL \url{http://arxiv.org/abs/1703.09452}.
+
+\bibitem[Qi(2017)]{DBLP:journals/corr/Qi17}
+Guo{-}Jun Qi.
+\newblock Loss-sensitive generative adversarial networks on lipschitz
+  densities.
+\newblock \emph{CoRR}, abs/1701.06264, 2017.
+\newblock URL \url{http://arxiv.org/abs/1701.06264}.
+
+\bibitem[Radford et~al.(2015)Radford, Metz, and
+  Chintala]{DBLP:journals/corr/RadfordMC15}
+Alec Radford, Luke Metz, and Soumith Chintala.
+\newblock Unsupervised representation learning with deep convolutional
+  generative adversarial networks.
+\newblock \emph{CoRR}, abs/1511.06434, 2015.
+\newblock URL \url{http://arxiv.org/abs/1511.06434}.
+
+\bibitem[Salimans et~al.(2016)Salimans, Goodfellow, Zaremba, Cheung, Radford,
+  and Chen]{DBLP:journals/corr/SalimansGZCRC16}
+Tim Salimans, Ian~J. Goodfellow, Wojciech Zaremba, Vicki Cheung, Alec Radford,
+  and Xi~Chen.
+\newblock Improved techniques for training gans.
+\newblock \emph{CoRR}, abs/1606.03498, 2016.
+\newblock URL \url{http://arxiv.org/abs/1606.03498}.
+
+\bibitem[Salimans et~al.(2017)Salimans, Karpathy, Chen, and
+  Kingma]{DBLP:journals/corr/SalimansKCK17}
+Tim Salimans, Andrej Karpathy, Xi~Chen, and Diederik~P. Kingma.
+\newblock Pixelcnn++: Improving the pixelcnn with discretized logistic mixture
+  likelihood and other modifications.
+\newblock \emph{CoRR}, abs/1701.05517, 2017.
+\newblock URL \url{http://arxiv.org/abs/1701.05517}.
+
+\bibitem[Taigman et~al.(2016)Taigman, Polyak, and
+  Wolf]{DBLP:journals/corr/TaigmanPW16}
+Yaniv Taigman, Adam Polyak, and Lior Wolf.
+\newblock Unsupervised cross-domain image generation.
+\newblock \emph{CoRR}, abs/1611.02200, 2016.
+\newblock URL \url{http://arxiv.org/abs/1611.02200}.
+
+\bibitem[van Hasselt et~al.(2015)van Hasselt, Guez, and
+  Silver]{DBLP:journals/corr/HasseltGS15}
+Hado van Hasselt, Arthur Guez, and David Silver.
+\newblock Deep reinforcement learning with double q-learning.
+\newblock \emph{CoRR}, abs/1509.06461, 2015.
+\newblock URL \url{http://arxiv.org/abs/1509.06461}.
+
+\bibitem[Wang et~al.(2015)Wang, de~Freitas, and
+  Lanctot]{DBLP:journals/corr/WangFL15}
+Ziyu Wang, Nando de~Freitas, and Marc Lanctot.
+\newblock Dueling network architectures for deep reinforcement learning.
+\newblock \emph{CoRR}, abs/1511.06581, 2015.
+\newblock URL \url{http://arxiv.org/abs/1511.06581}.
+
+\bibitem[Yu et~al.(2016)Yu, Zhang, Wang, and Yu]{DBLP:journals/corr/YuZWY16}
+Lantao Yu, Weinan Zhang, Jun Wang, and Yong Yu.
+\newblock Seqgan: Sequence generative adversarial nets with policy gradient.
+\newblock \emph{CoRR}, abs/1609.05473, 2016.
+\newblock URL \url{http://arxiv.org/abs/1609.05473}.
+
+\bibitem[Zhang et~al.(2016)Zhang, Xu, Li, Zhang, Huang, Wang, and
+  Metaxas]{DBLP:journals/corr/ZhangXLZHWM16}
+Han Zhang, Tao Xu, Hongsheng Li, Shaoting Zhang, Xiaolei Huang, Xiaogang Wang,
+  and Dimitris~N. Metaxas.
+\newblock Stackgan: Text to photo-realistic image synthesis with stacked
+  generative adversarial networks.
+\newblock \emph{CoRR}, abs/1612.03242, 2016.
+\newblock URL \url{http://arxiv.org/abs/1612.03242}.
+
+\bibitem[Zhao et~al.(2017)Zhao, Wu, Cheng, Liu, and
+  Feng]{DBLP:journals/corr/ZhaoWCLF17}
+Bo~Zhao, Xiao Wu, Zhi{-}Qi Cheng, Hao Liu, and Jiashi Feng.
+\newblock Multi-view image generation from a single-view.
+\newblock \emph{CoRR}, abs/1704.04886, 2017.
+\newblock URL \url{http://arxiv.org/abs/1704.04886}.
+
+\bibitem[Zhao et~al.(2016)Zhao, Mathieu, and
+  LeCun]{DBLP:journals/corr/ZhaoML16}
+Junbo~Jake Zhao, Micha{\"{e}}l Mathieu, and Yann LeCun.
+\newblock Energy-based generative adversarial network.
+\newblock \emph{CoRR}, abs/1609.03126, 2016.
+\newblock URL \url{http://arxiv.org/abs/1609.03126}.
+
+\bibitem[Zhu et~al.(2017)Zhu, Park, Isola, and
+  Efros]{DBLP:journals/corr/ZhuPIE17}
+Jun{-}Yan Zhu, Taesung Park, Phillip Isola, and Alexei~A. Efros.
+\newblock Unpaired image-to-image translation using cycle-consistent
+  adversarial networks.
+\newblock \emph{CoRR}, abs/1703.10593, 2017.
+\newblock URL \url{http://arxiv.org/abs/1703.10593}.
+
+\end{thebibliography}
