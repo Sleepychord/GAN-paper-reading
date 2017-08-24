@@ -42,7 +42,10 @@ for article in articles:
 
       print name
       try:
-         pdf = requests.get(url_pattern.search(article).group(1))    
+         url_res = url_pattern.search(article).group(1)
+         url_res = re.sub(r'abs', r'pdf', url_res)
+         print url_res
+         pdf = requests.get(url_res, stream=True)    
          pdf.raise_for_status()
       except requests.RequestException as e:
           print(e)
