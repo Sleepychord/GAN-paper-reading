@@ -41,20 +41,30 @@
 \caption{生成模型分类}
 \label{fig:taxonomy}
 \end{figure}
-在GAN发明人，Ian Goodfellow在NIPS2016的讲稿\cite{gan_tutorial}中，他曾将生成模型如图 \ref{fig:taxonomy}分类。可以看出GAN只是生产模型中新兴起的小分支。
+在GAN发明人，Ian Goodfellow在NIPS2016的讲稿\cite{gan_tutorial}中，他曾将生成模型如图 \ref{fig:taxonomy}分类。可以看出GAN只是生成模型中新兴起的小分支。近一年来，对抗生成网络不断升温，究其原因大约有以下几点：
+\begin{enumerate}
+\item 对抗生成网络以深度学习为基础，其基本任务为图像生成，与计算机视觉领域的卷积神经网络为基础的浪潮息息相关，吸引了该领域的众多研究者。
+\item 隐式生成网络根据真实分布生成样本，这种全新的能力可以产生逼真的照片、漫画、艺术、文本等数据，符合人类对人工智能的幻想。
+\item GAN拥有优秀的效果的同时，理解起来不需要非常深厚的数学基础。在流行的深度学习框架的基础上，只需不多的代码就可以实现与训练。
+\item 无监督学习被普遍认为是机器学习的发展方向，GAN作为其中最出色的模型之一，有很大潜力。
+\item GAN虽然最初用于图像数据，但从原理上讲并不拘泥于图像，因此拥有迁移到其他类型数据的潜力。
+\end{enumerate}
 
 本文主要介绍GAN的原理、进展及应用，但是也将在正式介绍之前适当介绍部分其他生成模型。
 
-GAN的理论发展主要集中在损失函数上，比较有价值的几个进展是：
+文章的第一部分简单介绍一些相关的模型，如变分自编码机(Variational Auto-Encoder)、传统的基于RNN的文本生成方法、pix2pix任务(GAN的一个重要应用)的直接监督学习方法等。
+
+文章的第二部分讲GAN的理论发展。所谓理论是可以从数学的角度解释“GAN在做什么”“为什么GAN可以生成真实分布的样本”“为什么GAN可以收敛”等基本问题的研究，其实GAN的理论发展可以从生成网络的损失函数的角度看，比较有价值的几个进展是：
 \begin{enumerate}
 \item GAN，优化生成网络的JS散度
 \item WGAN，优化生成网络的Wasserstein距离
 \item LSGAN，机器学习确定损失函数
+\item EBGAN，定义损失函数为重构误差
 \end{enumerate}这些是本文的重点。
 
-GAN的实践中总结出了很多技巧和模型，它们在图像生成任务中可以取得更好的效果。这样的工作最多，文章大部分的篇幅将围绕它们展开。
+文章第三部分讲GAN的实践。所谓实践是应用研究者总结出了很多技巧和模型，它们在图像生成任务中可以取得更好的效果。他们可能是增加一些正则项或者与其他结构进行低耦合的结合，但是不像上述几篇文章那样在GAN的原理本身上有所突破。这样的工作最多，文章大部分的篇幅将围绕它们展开。
 
-虽然GAN最初出现在图像领域，但是很多人将GAN应用于NLP、IR等其他领域，并取得了不错的效果。文章也将选择性地介绍几篇应用的文章。
+文章的第四部分讲GAN的应用。虽然GAN最初出现在图像领域，但是很多人将GAN应用于NLP、IR等其他领域，并取得了不错的效果。文章也将选择性地介绍几篇应用的文章。
 
 文章的最后将介绍几篇强化学习的论文，在GAN的应用，特别是在序列数据生成方面，很多问题和强化学习中的问题是相似的，越来越多的任务使用了强化学习中的技巧。
 \section{传统生成模型}
@@ -67,29 +77,29 @@ Varitional AutoEncoder是一个传统的生成模型，它处理如下传统问�
 \item 生成隐变量$z\sim p_\theta(z)$，$z\in R^K$
 \item 生成样本$x \sim p_\theta(x|z)$
 \end{itemize}
-同时由于x边缘似然难以积分(intractable)，所有隐变量的后验概率$p_{\theta}(z|x) = \frac{p_\theta(x|z)p_\theta(z)}{p_\theta(x)}$是难以计算的。不能使用EM算法。
+同时由于x边缘似然难以积分(intractable)，所以隐变量的后验概率$p_{\theta}(z|x) = \frac{p_\theta(x|z)p_\theta(z)}{p_\theta(x)}$是难以计算的。不能使用EM算法。
 
 从
 $D_{KL}(q(z|X)||p(z|X))=-\mathbb{E}_{z\sim q(z|X)}[\log\frac{p(z|X)}{q(z|X)}]$可以变形推出：
 $$\log p(X)=D_{KL}(q(z|X)||p(z|X))+ L(p,q,X)$$
 $$L(p,q,X)=-D_{KL}(q(z|X)||p(z))+\mathbb{E}_{z\sim q(z|X)}[\log p(X|z)]$$
-由于KL散度大于0，L被称为variational lower bound。
+对于这步变分推断的解释，有一种广为流传的说法是这样的：这是一个恒等式，对于某个特定样本，$\log p(X)$为常数，q是我们自己确定的分布。如果想让q与p尽量接近，那么就应该让$L(p,q,X)$尽量大。我认为这种说法是不自洽的，首先这里p并不是真实分布，而是我们的模型中的分布，所以p(X)并不是常数。其次，如果p是固定的那么后面也不应该优化$p(X|z)$，自相矛盾。最后我们目标并不是让p与q尽量接近。
 
-我们的目标就是优化$q(z|X)$的参数$\phi$和$p(X|z)$的参数$\theta$，同时假设z的先验概率为$\mathcal{N}(0,I)$。根据q、p模型的不同，可以得到不同的VAE，文中给出的例子是二者均为多元高斯分布。
+原文的说法是这样的：我们的目标是优化p使得样本似然$\sum \log p(X_i)$，利用SGD的思想，我们考虑对于某个样本$\log p(X)$的优化。由于$D_{KL}(q(z|X)||p(z|X)) > 0$，所以$L(p,q,X)$是该似然项的一个下界。优化这个下界能从一定程度上优化该似然项。优化过程中，p、q都是我们的变量。L被称为variational lower bound。
 
-现在面临的另一个问题是，刚才的推断建立在针对单一样本X上。即使我们得到了一组最优的参数，可是它们只是条件概率的参数，对于其他样本来说仍然不适用。所以我们更希望得到的是$Q(X)\longrightarrow\phi、P(z) \longrightarrow \theta$这两个用神经网络去拟合。
+我们的目标就是优化$q(z|X)$的参数和$p(X|z)$的参数，同时假设z的先验概率为$\mathcal{N}(0,I)$。根据q、p模型的不同，可以得到不同的VAE，文中给出的例子是二者均为多元高斯分布。
+
+现在面临的另一个问题是，刚才的推断建立在针对单一样本X上。即使我们得到了一组最优的参数，可是它们只是条件概率的参数，对于其他样本来说仍然不适用。所以我们更希望得到的是$q_{\Phi}(\cdot|X)$和$p_{\theta}(\cdot|z)$这两个变量到函数的映射，可以用两个神经网络去拟合。拟合方法就是输入条件变量，假设最终分布符合某种类型(比如高斯或伯努利分布)，生成分布参数。这两个神经网络被称为encoder和decoder。
 \begin{figure}
 \includegraphics[width=\textwidth]{./img/2.png}
 \caption{VAE}
 \label{fig:vae}
 \end{figure}
-其实这里已经与假设有点不同了，假设的生成过程中$\theta$与$z$应该是无关的，而这里变成了z的函数。
 
-但是网络上大部分的写法与论文差距更大——直接用神经网络拟合$p(X|z)$，可是X通常很高维且连续，神经网络不可能生成连续分布，于是将模型转化为隐式生成模型，并将sample得到的值同标准值的MSE作为loss的第二部分。
-
-这种做法的原理未能查到任何出处。但是\citep{vae_toturial}以图\ref{fig:vae}的形式展示了这一做法。
-\subsection{Generating Sequences With Recurrent Neural Networks\cite{DBLP:journals/corr/Graves13}}
-这是通过RNN、LSTM等模型直接生成序列的方法，通过MLE进行训练。
+但是网络上大部分的写法与论文不同，假设更为简单。假设$P_\theta \sim \mathcal{N}(X,I)$，那么decoder
+只需生成分布的样本均值X,而容易推导出$\log p_\theta(x|z) = ||x - X||_2^2$。这正是生成样本(或者说分布均值)与数据样本的MSE。\citep{vae_toturial}以图\ref{fig:vae}的形式展示了这一做法。
+\subsection{Generating Sequences With Recurrent Neural Networks\cite{DBLP:journals/corr/Graves13}} 
+这是通过RNN、LSTM等模型直接生成序列的方法，通过\textbf{最大似然估计}进行训练。
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{./img/3.png}
@@ -97,6 +107,8 @@ $$L(p,q,X)=-D_{KL}(q(z|X)||p(z))+\mathbb{E}_{z\sim q(z|X)}[\log p(X|z)]$$
 \label{fig:rnn}
 \end{figure}
 对于某个样本，$$loss = -\sum\limits_{t=1}^{T} log \ Pr(x_{t+1}|y_t)$$
+$x_t$指序列第t个元素，$y_t$指RNN在处理到第t时刻时的状态。
+
 具体做法是：
 \begin{enumerate}
 \item predict的时候$x_{-1}$为0，预测$y_0$，它是一个在字典上的条件概率分布，然后根据这个分布随机生成一个作为$x_0$输入到下一层，
@@ -104,16 +116,18 @@ $$L(p,q,X)=-D_{KL}(q(z|X)||p(z))+\mathbb{E}_{z\sim q(z|X)}[\log p(X|z)]$$
 \end{enumerate}
 这里有个小trick，据说训练LSTM的时候梯度可能非常大，在LSTM的input处对梯度做截断。
 \subsection{Photographic Image Synthesis with Cascaded Refinement Networks\cite{chen2017photographic}}
-这是一篇与pix2pix的工作，针对其中的mask转化为真实图像的任务。文章使用了大量数据，没有采用GAN而是一种比较直接的卷积神经网络生成，取得了state-of-art的效果。
+这是一篇与pix2pix的工作，针对其中的mask图(将各种物体分离并涂成同一种颜色)转化为真实图像的任务。文章使用了大量数据，没有采用GAN而是一种比较直接的卷积神经网络生成，取得了state-of-art的效果。
 
-这说明监督学习中，如果有大量成对的数据，可能还是直接映射的方法比较好。文章输入mask图片，并且不断经过多个Module，每次分辨率长宽翻倍。每个Module分三层，输入上层的输出和相应大小的mask图片，输出一定channels（256）的图片。
+这说明监督学习中，如果有大量成对的数据，可能还是直接映射的方法比较好。文章输入mask图片，并且不断经过多个Module，每次分辨率长宽翻倍。每个Module分三层，输入上层Module的输出和相应大小的mask图片，输出一定channels（256）的图片。经过多层之后可以生成长宽上千像素的高清大图。
+
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{./img/41.png}
 \caption{photographic效果图}
 \label{fig:41}
 \end{figure}
-效果图见\ref{fig:41}。注意最后的loss是生成图像、真实图像通过VGG网络各层之间的差距$\sum_l \lambda_l||\Phi_l(I)-\Phi(g_u(L,\theta))||_1$。
+
+效果图见\ref{fig:41}。注意最后的loss是生成图像、真实图像通过VGG网络各层之间的差距$\sum_l \lambda_l||\Phi_l(I)-\Phi(g_u(L,\theta))||_1$。l为各层编号，$\Phi$表示VGG网络到各层的映射。
 \section{GAN理论}
 \subsection{原始GAN}
 \subsubsection{Generative Adversarial Networks\cite{gan}}
@@ -125,38 +139,32 @@ $$
 \min_G \max_D V(D, G) = \mathbb{E}_{\bm{x} \sim p_{\text{data}}(\bm{x})}[\log D(\bm{x})] + \mathbb{E}_{\bm{z} \sim p_{\bm{z}}(\bm{z})}[\log (1 - D(G(\bm{z})))].
 $$
 \begin{algorithm}[ht]
-\caption{\small Minibatch stochastic gradient descent training of generative adversarial nets.
-The number of steps to apply to the discriminator, $k$, is a hyperparameter. We used $k=1$, the
-least expensive option, in our experiments.
+\caption{\small GAN算法实现。
+实验中$k=1$
 }
 \begin{algorithmic}
 \label{alg:AGF}
-\FOR{number of training iterations}
-  \FOR{$k$ steps}
-    \STATE{$\bullet$ Sample minibatch of $m$ noise samples $\{ \bm{z}^{(1)}, \dots, \bm{z}^{(m)} \}$ from noise prior $p_g(\bm{z})$.}
-    \STATE{$\bullet$ Sample minibatch of $m$ examples $\{ \bm{x}^{(1)}, \dots, \bm{x}^{(m)} \}$ from data generating distribution $p_\text{data}(\bm{x})$.}
-    \STATE{$\bullet$ Update the discriminator by ascending its stochastic gradient:
+\FOR{训练轮数}
+  \FOR{$k$ 步}
+    \STATE{$\bullet$ 根据先验分布 $p_g(\bm{z})$抽出一批次共 $m$ 个噪音样本 $\{ \bm{z}^{(1)}, \dots, \bm{z}^{(m)} \}$}
+    \STATE{$\bullet$ 从数据中抽取一批次共 $m$ 个样本 $\{ \bm{x}^{(1)}, \dots, \bm{x}^{(m)} \}$ ，显然他们符合真实数据分布 $p_\text{data}(\bm{x})$}
+    \STATE{$\bullet$ 通过随机梯度上升的方法更新判别器:
         \[
             \nabla_{\theta_d} \frac{1}{m} \sum_{i=1}^m \left[
             \log D\left(\bm{x}^{(i)}\right)
             + \log \left(1-D\left(G\left(\bm{z}^{(i)}\right)\right)\right)
             \right].
         \]}
-    %parameters $\theta_d$ of discriminator $D$
-   %in the direction of the stochastic gradient of the binomial cross-entropy
-   %for $D$ predicting whether its argument comes from $p_\text{data}(\bm{x})$ (target = 1, input = $\bm{x}$) or
-   %$P_g$ (target = 0, input = $G(\bm{z})$), i.e., towards minimizing
-   % \mbox{$-\log D(\bm{x}) - \log(1 - D(G(\bm{z})))$}.}
    \ENDFOR
-  \STATE{$\bullet$ Sample minibatch of $m$ noise samples $\{ \bm{z}^{(1)}, \dots, \bm{z}^{(m)} \}$ from noise prior $p_g(\bm{z})$.}
-    \STATE{$\bullet$ Update the generator by descending its stochastic gradient:
+  \STATE{$\bullet$ 根据先验分布 $p_g(\bm{z})$抽出一批次共 $m$ 个噪音样本 $\{ \bm{z}^{(1)}, \dots, \bm{z}^{(m)} \}$}
+    \STATE{$\bullet$ 通过随机梯度下降的方法更新生成器:
         \[
             \nabla_{\theta_g} \frac{1}{m} \sum_{i=1}^m
             \log \left(1-D\left(G\left(\bm{z}^{(i)}\right)\right)\right)
             .
         \]}
   \ENDFOR
-  \\The gradient-based updates can use any standard gradient-based learning rule. We used momentum in our experiments.
+  \\更新可以使用任何以梯度为基础的方法，这里我们使用了基于动量(momentum)的方法。
 \end{algorithmic}
 \end{algorithm}
 首先看从整个取值空间来看，
@@ -177,27 +185,30 @@ V(G, D) =& \int_{\bm{x}} p_\text{data}(\bm{x}) \log(D(\bm{x})) dx + \int_z p_{\b
 
 \subsection{WGAN}
 \subsubsection{Towards Principled Methods for Training Generative Adversarial Networks\cite{DBLP:journals/corr/ArjovskyB17}}
-这
-篇文章是WGAN前作，指出了GAN的问题所在。实际训练为什么要“平衡”生成和判别模型，而原文说直接将判别模型训练到最好就可以了。
+大家在实现GAN的时候发现训练很不稳定，如果判别模型拟合能力过强或者过弱都会导致生成模型陷入质量很差的状态。而原文说直接将判别模型训练到最好就可以了，与实际经验不符。
+这篇文章是WGAN前作，指出了GAN的问题所在。实际训练为什么要“平衡”生成和判别模型。
 原文指出D训练到最优时，$$D(x) = \frac{p_{data}(x)}{p_g(x) + p_{data}(x)}$$
-此时对于生成模型的优化，$$L(D^*,g_\theta)=2JSD(\mathbb{P}_g||\mathbb{P}_{data})-2\log 2$$只需优化（梯度下降）这个JS散度。
-但实际上，这个梯度下降难以进行。假设$p_{data}、p_{g}$重合度很低，此时发现JS散度是常数，没办法梯度下降。实际上他们都是高维空间（图像n*m）的低维流形，不重合概率很大。
-原文提出的另一种改变G的loss则受梯度不稳定和mode collapse的困扰。
-
-这篇文章给出的方法是给噪音退火，使得初值达到一个有不少重合的状态。
+此时对于生成模型的优化，$$L(D^*,g_\theta)=2JSD(\mathbb{P}_g||\mathbb{P}_{data})-2\log 2$$只需优化(梯度下降)这个JS散度。
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{./img/4.png}
 \caption{训练时间与梯度}
 \label{fig:4}
 \end{figure}
+但实际上，这个梯度下降难以进行，见图\ref{fig:4}。假设$p_{data}、p_{g}$重合度很低，此时发现JS散度是常数，没办法梯度下降。实际上他们都是高维空间（图像n*m）的低维流形，不重合概率很大。
+
+原文提出的另一种改变G的loss的方法，即优化G时通过随机梯度下降优化$-\log D(G(z))$，则受梯度不稳定和mode collapse(指生成的样本集中在某个特定值附近，多样性不够的情况)的困扰。
+
+这篇文章给出的方法是给噪音退火，使得初值达到一个有不少重合的状态。但由于效果不好且实现复杂，几乎没有受到任何关注。反而作者之后发的WGAN由于见解深刻，易于实现，被奉为圭臬。
+
 \subsubsection{Wasserstein GAN\cite{DBLP:journals/corr/ArjovskyCB17}}
 Wasserstein距离
 $W(p_r,p_g)=\inf\limits_{\gamma\in \prod (p_r,p_g) }\mathbb{E}_{(x,y)\sim \gamma}[||x - y||]$
 就是找一个分配方案，使得联合概率分布集中在对角线附近。一阶距就是Earth-Mover。
 分布没有重叠的时候Wasserstein距离也有梯度。
 有定理$$W(p_r,p_g) = \frac{1}{K}\sup\limits_{||f||_L\leq K}\mathbb{E}_{x\sim P_r}[f(x)]-\mathbb{E}_{x\sim P_g}[f(x)]$$
-即对于所有满足Lipschitz条件的且Lipschitz常数小于K的函数中，期望差的上界。证明略。
+即对于所有满足Lipschitz条件(梯度变化不太剧烈)的且Lipschitz常数小于K的函数中，期望差的上界。证明略。
+
 用一个神经网络代替f的集合。为了满足Lipschitz常数小于K，强行将权值clip到一个规定的范围内。这样得到的值是Wasserstein距离的常数倍，梯度方向不变。
 
 这个距离应该是G的loss，那么就用这个神经网络f代替D，使用样本充分训练使这个值极大后就代表了$p_g、p_r$之间的Wasserstein距离。那么最后实际更改的就只有：
@@ -222,7 +233,7 @@ weight clipping 有两个重要问题：\\
 效果不太好。
 于是不直接限制梯度，而是在后面加一个惩罚项。将判别器的目标改为
 $$L = \mathbb{E}_{x\sim p_g}[D(x)]-\mathbb{E}_{x\sim p_r}[D(x)] + \lambda\mathbb{E}_{x\sim p_x}[(||\nabla_xD(x)||_2-1)^2], \lambda = 10$$
-需要用到二阶梯度，可以用差分代替。
+由于loss function中有梯度，需要用到二阶梯度，这点在很多深度学习框架中不支持。
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{./img/6.jpg}
@@ -251,9 +262,45 @@ $$L_\theta(G(z)) - L_\theta(x) \geq \Delta(x, G(z))$$其中$\Delta$为样本距�
 \label{fig:31}
 \end{figure}
 优化G，$\mathbb{E}_{z\sim p_z}L_\theta(G(z))$。算法描述如\ref{fig:31}。
+\subsection{LSGAN(least square GAN)}
+\subsubsection{Multi-class Generative Adversarial Networks with the L2 Loss Function\cite{DBLP:journals/corr/MaoLXLW16}}
+这篇文章恰好缩写也是LSGAN，要注意与loss sensitive GAN区分。
+
+这是一个非常solid的工作，效果是比较优秀的，而且容易适用于之前其他的架构和任务。
+
+文章注意到了对于某些噪音生成的样本，如果离真实分布较远的话，那么更新G后对这些噪音生成的样本提升不大，这点可以看图\ref{fig:46}。
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{./img/46.png}
+\caption{普通GAN和LSGAN对于边缘数据的提升}
+\label{fig:46}
+\end{figure}
+正是这一点造成GAN训练不够稳定，作者通过改变GAN的损失函数来避免这一点。将优化目标改为
+$$\min\limits_D V(D) =\frac{1}{2}\mathbb{E}_{x\sim p_{data}(x)}[(D(x)-b)^2]
++ \frac{1}{2}\mathbb{E}_{z\sim p_z(z)}[(D(G(z))-a)^2]$$
+$$\min\limits_G V(G) = \frac{1}{2}\mathbb{E}_{z \sim p_z(z)}[(D(G(z))-c)^2]$$
+其中a、b分别是fake data和real data的应输出数值。c是G希望D让假样本输出的数值，生成真实样本的话等于b。但是理论分析中发现，优化D可以得到$D^*(x) = \frac{bp_{data}(x) + ap_g(x)}{p_{data}(x) + p_g(x)}$
+而优化G可以得到最优值$$2C(G) = \int \frac{((b-a)p_g(x)-(b-c)(p_d(x)+p_g(x)))^2}{p_d(x)+p_g(x)}dx$$
+
+如果令$b-c=1,b-a=2$的话，可以得到$\mathcal{X}^2_{Pearson}(p_d+p_g||2p_g)$仍是二分布相等的时候取得最优值。
+
+但是实际发现令$a=-1,b=1,c=0$和$a=0,b=1,c=1$差别不大。用于基本GAN任务的模型如图\ref{fig:44}所示。如果数据有多类的话，为了生成指定类别数据，可以将类别信息当做监督信息输入进去，使用Conditional GAN的形式，具体模型如图\ref{fig:45}。
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{./img/44.png}
+\caption{LSGAN基本模型}
+\label{fig:44}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{./img/45.png}
+\caption{LSGAN指定类生成模型}
+\label{fig:45}
+\end{figure}
+
 \subsection{基于能量函数的GAN的变体}
 \subsubsection{Energy-based Generative Adversarial Network\cite{DBLP:journals/corr/ZhaoML16}}
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{./img/34.png}
 \caption{EBGAN图解}
@@ -262,14 +309,18 @@ $$L_\theta(G(z)) - L_\theta(x) \geq \Delta(x, G(z))$$其中$\Delta$为样本距�
 文章重定义了GAN的度量方法，假设存在一个能量函数，它在真实样本处接近于0，在假样本处接近于m。那么我们定义G，D的Loss为：
 $$\mathcal{L}_D(x,z) = D(x) + max(m - D(G(z)),0)$$
 $$\mathcal{L}_G(z) = D(G(z))$$
-那么这个系统的Nash均衡点可以证明是$$p_g = p_{data}$$是得到。
+那么这个系统的Nash均衡点可以证明是$p_g = p_{data}$是得到。
+
 定义loss-function为autoencoder的重构误差\ref{fig:34}，认为这样做的好处是梯度来源提供的信息量比较大。
-另外文章定义了一个pull-away term，让每个batch生成的有差别的一个loss项。
+
+另外文章定义了一个pull-away term，让每个batch生成的有差别的一个loss项。这是为了防止前文提到的mode collapse现象。
 $$\frac{1}{N(N-1)}\sum\limits_i\sum\limits_{j \neq i}(\frac{S_i^TS_j}{||S_i||||S_j||})^2$$
 S为encode出来的向量。
 \subsubsection{BEGAN: Boundary Equilibrium Generative Adversarial Networks\cite{DBLP:journals/corr/BerthelotSM17}}
-这篇文章是基于EBGAN的，首先修改了均衡的假设， 不再是真实样本为0，生成样本为m，而是满足一个接近1的倍数关系
-\begin{figure}
+这篇文章是基于EBGAN的，首先修改了均衡的假设。loss function不再是真实样本输出0，生成样本输出m，而是满足生成样本和真实样本的输出有一个接近1的倍数关系。
+
+这样做的好处是原来的loss function中对于二者的重视程度，如果生成样本的输出$D(G(z))$与真实样本的输出$D(x)$的比大于规定的常数，那么优化时先让D
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{./img/35.png}
 \caption{BEGAN训练过程}
@@ -279,15 +330,18 @@ $$\gamma \mathcal{L}(x)=\mathcal{L}(G(z))$$
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{./img/36.png}
-\caption{EBGAN图解}
+\caption{BEGAN图解}
 \label{fig:36}
 \end{figure}
 \subsection{GAN的问题}
 \subsubsection{Do GANs actually learn the distributions? An empirical study\cite{DBLP:journals/corr/AroraZ17}}
-作
-者使用实验来说明GAN学出来的分布support size（离散分布中的非0点）不大，这是一个连续分布，用类（mode）代替。
+一个离散分布的support指概率非零点的数目。
+
+GAN面临的一个严重的问题是mode collapse，就是说生成器没办法生成所有类型的图像，只能生成其中一两类；换句话说就是这个隐式生成模型的support比原来的小，并没有学到真实的数据分布。
+
+作者使用实验来说明GAN学出来的分布support size不大。
 根据生日悖论，如果我们能够随机抽一些看重复，可以估算出分布的support size。
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{./img/7.png}
 \label{fig:7}
@@ -297,12 +351,13 @@ $$\gamma \mathcal{L}(x)=\mathcal{L}(G(z))$$
 \label{fig:8}
 \end{figure}
 
-这样估计出了大部分概率构成的分布的support size的上界。实验证明学得的分布的support size远小于应有的数据集的support size。
-证明了mode collapse的严重程度。
+采样之后根据定理\ref{fig:7}\ref{fig:8}可以估计出了大部分概率构成的分布的support size的上界。实验证明学得的分布的support size远小于应有的数据集的support size。
+文章证明了mode collapse的严重程度，对GAN的效果提出了严厉的质疑。
 \section{GAN实践}
 \subsection{高质量图片生成}
 \subsubsection{Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks\cite{DBLP:journals/corr/RadfordMC15}}
-文章仅仅是将MLP用卷积神经网络实现了一下，但是通过细致的调参产生了很好的效果。\ref{fig:9}给出了一些设计的建议，\ref{fig:10}是最终使用的网络架构。
+在GAN原文中，生成器和判别器都是用多层感知机(MLP)实现的，
+文章仅仅是将MLP用卷积神经网络(CNN)实现了一下，但是通过细致的调参产生了很好的效果。\ref{fig:9}给出了一些设计的建议，\ref{fig:10}是最终使用的网络架构。
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{./img/9.png}
@@ -315,23 +370,31 @@ $$\gamma \mathcal{L}(x)=\mathcal{L}(G(z))$$
 \caption{生成器架构}
 \label{fig:10}
 \end{figure}
-\subsubsection{Deep Generative Image Models using a Laplacian Pyramid of Adversarial Networks\cite{DBLP:journals/corr/DentonCSF15}}
-图像的laplacian金字塔在SIFT中用到过，但是这里似乎只用到了上下采样的层次，没有每个octave内部的分辨率变化。
-于是我们训练多个GAN，直接生成最小的，然后conditional GAN的方法将upsampled的图像输进去生成差值。
 
+应该说从理论意义上，这篇文章没有什么创新。但是从工程的角度，细致的调参确实产生了比GAN原文好太多的效果，成为了后续算法的baseline，而且后续算法很少有能超过它的。所以这篇文章在GAN的文章列表中占举足轻重的低位。
+\subsubsection{Deep Generative Image Models using a Laplacian Pyramid of Adversarial Networks\cite{DBLP:journals/corr/DentonCSF15}}
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{./img/15.png}
 \caption{LAPGAN架构}
 \label{fig:15}
-\end{figure}解决“GAN直接生成图像一旦分辨率较大就出问题”。
+\end{figure}
+这篇文章创作时，GAN很难生成大分辨率的图片。因此文章希望能够通过层次化生成的方法，利用多个GAN生成大分辨率的图像\ref{fig:15}。
+
+图像的laplacian金字塔在SIFT中用到过，但是这里似乎只用到了上下采样的层次，没有每个octave内部的分辨率变化。
+于是我们训练多个GAN，直接生成最小的那层图像，然后conditional GAN的方法将upsampled的图像输进下一层生成差值。最后用生成出来的差值图像与上一层unsample的图像相加，得到这一层的图像。
+
+解决“GAN直接生成图像一旦分辨率较大就出问题”。
 \subsubsection{Generating Images Part by Part with Composite Generative Adversarial Networks\cite{DBLP:journals/corr/KwakZ16}}
 想法是将图片生成问题分为多部分，比如背景、前景、装饰等……
-使用一个RNN产生时序的输出，然后通过不同的G来生成不同的部分。
-各部分通过alpha-blend融合在一起，就是将后一张图片中透明权重用前面生成的图片代替。
-为了防止只有一个G起作用，增加了一个正则
+
+使用一个RNN产生时序的输出，然后通过不同的G来生成不同的部分。\ref{fig:21}
+
+各部分通过alpha-blend融合在一起。alpha-blend就是将后一张图片中透明权重用前面生成的图片代替。
+
+实验中发现用RNN生成经常就是前面都产生纯黑图片，只有最后一张产生目标图像。为了防止只有一个G起作用，增加了一个正则
 $$|u - \sum C_{ijA}|-\sum (C_{ijA}-0.5)^2$$
-其中u是一个自己定义的不透明度之和，防止前面都生成透明图像。后面的强迫透明度取0、1。
+其中u是一个自己定义的不透明度之和，前半部分说各图像的透明度之和应该接近这个数，防止前面都生成透明图像。公式后面半部分强迫透明度取0或1。
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{./img/21.png}
@@ -339,10 +402,12 @@ $$|u - \sum C_{ijA}|-\sum (C_{ijA}-0.5)^2$$
 \label{fig:21}
 \end{figure}
 \subsubsection{Generating images with recurrent adversarial networks\cite{gran}}
-学习DRAW的生成方法，分部分生成,感觉结构与composite GAN很像。文章使用了一个很novel的度量方法，但是总之效果并没有很好。
+之前VAE分部分生成有一篇文章提出了DRAW的架构，本文学习DRAW的生成方法，分部分生成,感觉结构与composite GAN很像。文章使用了一个很novel的度量方法——“多个生成器交换判别器后看效果”，但是总之效果并没有很好。
 
 文章将RNN每层换成了encoder-decoder结构，但是隐含层的状态并没有传入下一层。其中decoder生成图片，是一个DCGAN的生成器。
 
+前馈分为3步：首先将上层图片经过本层encoder生成$h_{c,t}$，再并上噪音$h_{z,t}$得到向量h。
+之后将h输入到本层的decoder中，生成图片$\Delta C_t$。最后将所有$\Delta C_i$加起来，得到最终图像。
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{./img/38.png}
@@ -350,24 +415,34 @@ $$|u - \sum C_{ijA}|-\sum (C_{ijA}-0.5)^2$$
 \label{fig:38}
 \end{figure}
 
+但效果也比较一般，个人认为这种方法不值得推崇。
+
 \subsubsection{StackGAN: Text to Photo-realistic Image Synthesis with Stacked Generative Adversarial Networks\cite{DBLP:journals/corr/ZhangXLZHWM16}}
 精心设计了两个GAN的架构，根据文本描述生成256*256的高质量图片。
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{./img/16.png}
 \caption{StackGAN架构}
 \label{fig:16}
 \end{figure}
-值得注意的是，文本输入并没有直接使用embedding向量，作者认为向量过于稀疏效果不好，于是将向量通过两个神经网络生成一个N元高斯的均值向量和协方差矩阵，并加一项正则$$\lambda D_{KL}(\mathcal{N}(\mu(\phi_t),\Sigma(\phi_t))|| \mathcal{N} (0,I))$$使得这个分布尽量接近标准正态。
+值得注意的是，文本输入并没有直接使用embedding向量，作者认为向量过于稀疏效果不好，于是将向量通过两个神经网络生成一个N元高斯的均值向量和协方差矩阵，并加一项正则$$\lambda D_{KL}(\mathcal{N}(\mu(\phi_t),\Sigma(\phi_t))|| \mathcal{N} (0,I))$$使得这个分布尽量接近标准正态。当然这个做法和VAE很像，但是作者并没有从这个角度去解释。
 \subsection{pix2pix风格转换}
 \subsubsection{Image-to-Image Translation with Conditional Adversarial Networks\cite{DBLP:journals/corr/IsolaZZE16}}
-文章讨论如何将监督信息融入到GAN中，增加与真实转化图片的距离。给判别器和生成器的输入都增加转化前的原图。
-\begin{figure}
+这是一篇相当有影响力的文章，文中提出pix2pix的架构成为了GAN研究中的重要任务，效果也十分惊艳。
+
+文章讨论这样一个问题，如何将图片进行“风格转换”，这里的风格比如“照片->油画”、“轮廓->照片”等。更具体的说是在保留大轮廓信息的情况下改变细节。
+
+文章讨论如何将监督信息融入到GAN中，我们需要两种风格图像的成对数据，然后按照图\ref{fig:11}构建网络。
+G的输入是风格1的图像与噪音，D的输入是图形对：如果输入风格1的图像和数据中对应的风格2图像，那么应该输出1；如果输入风格1的图像和G生成的风格2的图像，那么应该输出0。
+
+另外增加loss项——与风格2真实图片的距离，以保证大轮廓不变。
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{./img/11.png}
 \caption{Conditional GAN}
 \label{fig:11}
 \end{figure}
+
 $$L_{L1}(G) = E_{x,y\sim p_{data}(x,y),z\sim p_z(z)}\left[||y-G(x,z)||_1\right]$$
 $$L = L_{GAN}(G,D) + \lambda L_{L1}(G)$$
 生成模型中使用了U-Net的结构，保证压缩信息的同时有原来的全部信息输入，这个与resNet有相同之处。
@@ -385,10 +460,11 @@ $$L = L_{GAN}(G,D) + \lambda L_{L1}(G)$$
 \caption{损失函数}
 \label{fig:13}
 \end{figure}
-研究这样一个问题：存在两个不同的Domain S、T，学习G(s)->t。同时有一个定义在S并T上的函数f，使得经过G的变化之后f不变，f可能代表了整体架构之类的信息。
-精心设计了复杂的网络\ref{fig:12}，结合了auto-encoder（获得f）以及GAN。
+研究这样一个问题：存在两个不同的Domain S、T，学习g(s)->t。同时有一个定义在S并T上的函数f，使得经过G的变化之后f不变，f可能代表了整体架构之类的信息。
 
-共多项损失\ref{fig:13}，但是lossTV最后没加。
+这个问题实际是pix2pix问题的泛化版，问题中显式地定义了所谓“大轮廓”相同是什么——f函数的输出不变。文章精心设计了复杂的网络\ref{fig:12}，结合了auto-encoder（获得f）以及GAN。
+
+共多项损失\ref{fig:13}，分别对应了“$f\cdot g$的不变性”“$g\cdot f$的不变性”“生成图像的逼真程度”“图像光滑性”，最后的光滑性对应lossTV，即相邻像素的差，但实现中没加。
 \subsubsection{Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks\cite{DBLP:journals/corr/ZhuPIE17}}
 还有两篇几乎同时发出的文章——Dual GAN、Disco GAN，做法相同。
 
@@ -402,7 +478,9 @@ $$L = L_{GAN}(G,D) + \lambda L_{L1}(G)$$
 \label{fig:18}
 \end{figure}
 通过重构误差。准确的说cycle consistency，这是一种历史悠久的技术了。具体见图\ref{fig:18}。
-文章中完全取消了conditional GAN的随机性（反正也没什么用）。
+由于噪音在实际测试中作用不大，文章中完全取消了conditional GAN的随机性。
+loss—function：
+
 $$L_{GAN}(G,D_Y,X,Y)=\mathbb{E}_{y\sim p_{data}(y)}[\log D_Y(y)]+\mathbb{E}_{x\sim p_{data}(x)}[\log D_Y(G(x))]$$
 $$L_{cyc}(G,F)=\mathbb{E}_{x\sim p_{data}(x)}[||F(G(x))-x||_1]+\mathbb{E}_{y\sim p_{data}(y)}[||G(F(y))-y||_1]$$
 实际将log换成平方效果更好。
@@ -410,10 +488,9 @@ $$L_{cyc}(G,F)=\mathbb{E}_{x\sim p_{data}(x)}[||F(G(x))-x||_1]+\mathbb{E}_{y\sim
 仍然是对于style变化有用，对于有geometry变化的东西效果不好，如dog->cat。
 \subsubsection{One-Sided Unsupervised Domain Mapping\cite{DBLP:journals/corr/BenaimW17}}
 这
-是一篇改进Cycle效果的文章。
-将原来的cycle只保留一半，然后加一项正则。
+是一篇改进Cycle效果的文章。原来从风格1转化到风格2再转化回去是借鉴了cycle consistency的技术，但文章发现好像不需要这么复杂，将原来的cycle只保留一半就行(比如风格1转化到风格2)，然后加一项正则。
 $$L_{distance}(G_{AB},\hat{p_A})=\mathbb{E}_{x_i,x_j\sim \hat{p_A}}|\frac{1}{\sigma_A}(||x_i-x_j||_1-\mu_A)-\frac{1}{\sigma_B}(||G_AB(x_i)-G_AB(x_j)||_1-\mu_B)|$$
-就是说原来domain的文章变换过去要归一化保距，这就更加强行限制了少出现mode collapse。
+就是说风格1的两个元素变换过去要归一化保距，这就更加强行防止出现mode collapse。因为这样不同类型的风格1图片在风格2中差距一定也比较大。
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{./img/19.png}
@@ -426,18 +503,20 @@ $$L_{distance}(G_{AB},\hat{p_A})=\mathbb{E}_{x_i,x_j\sim \hat{p_A}}|\frac{1}{\si
 \includegraphics[width=\textwidth]{./img/37.png}
 \caption{mask-conditional contrast-GAN}
 \label{fig:37}\end{figure}
-文章针对cycle GAN不能大幅改变物体的特点，提出用一个mask先找出需要替换的物体，然后用GAN生成另一类物体强行替换进去。\ref{fig:37}
+文章针对cycle GAN不能大幅改变物体的特点，提出用一个mask先找出需要替换的物体，然后用GAN生成另一类物体强行替换进去。\ref{fig:37}是网络架构，先使用Object Detection的方法找出应该替换的物体的mask，再将这部分物体通过网络进行替换，替换时在中间层加入需要替换成的类的信息。
 
-GAN生成的时候基本是基于Cycle GAN，但是加入一项contrast loss。
+具体的替换过程基于基于Cycle GAN，但是训练时加入一项contrast loss。
 $$Q(f_{y'},f_x,f_y)=-\log \frac{e^{-||f_{y'}-\overline{f_y}||}}
 {e^{-||f_{y'}-\overline{f_y}||} + e^{-||f_{y'}-f_x||}}$$
-
+$f_{y'},f_x,f_y$分别是某个feature提取函数在变换后的图像、变换前的图像、和风格2图像的真实分布的值。
+这个loss很大程度上优化变化后图像与风格2真实图形的距离。
 \subsection{生成控制}
 \subsubsection{Conditional Image Synthesis With Auxiliary Classifier GANs\cite{DBLP:journals/corr/OdenaOS16}}
-利
-用监督信息生成特定类图片。做法就是G输入噪音和类别信息，加入第二个D判别类别，这里类别判断都要最大化likelihood。
+有时候真实图片根据语义信息等可以分为多类，比如Mnist数据集中不同的数字。本文希望利用监督信息生成特定类图片。
+
+做法就是G输入噪音和类别信息$c_i$，并加入第二个判别器用来判别类别，最大化目标类的likelihood。
 $$L = L_{GAN}(G,D_1) + \mathbb{E}_{x\sim c_i}[\log D_2(x)_i]$$
-后一项包括真假两种情况，按照输入G时的c来定。
+后一项包括真假两种情况，如果是对于假图片，其目标类别按照输入G时的c来定。
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{./img/14.png}
@@ -453,10 +532,10 @@ G学习的是噪音分布到数据分布的映射，之前研究发现噪音向�
 确定一部分控制输入c，加regularization，使得已知生成样本后，对输入c的互信息很大。由于c是我们控制的，优化G只能将多个差异较大的样本分配给不同的c，这样就可以显式控制了。
 $$\min\limits_G\max\limits_D V_I(D,G)=V(D,G) - \lambda I(c;G(z,c))$$
 
-由于不知道真实分布，更不知道条件分布，没办法计算互信息，可以通过自己构造的模型代替p，并且把条件概率改为c的先验概率。
+由于不知道真实分布，更不知道条件分布，没办法计算互信息，可以通过自己构造的模型代替p，并且把条件概率改为c的先验概率。这点需要用到一些类似变分推断的知识，具体推导不展开了，可以看原文。
 $$I(c;G(z,c))\approx \mathbb{E}_{c\sim P(c), x\sim G(z,c)}[\log Q(c|x)] + H(c)$$
 \subparagraph{Implementation}
-新增加一部分网络Q，Q是将D前面的提取特征层重用，最后改为输出对c的条件概率的层。对于c取离散值的通过softmax，c取连续值的使用factored Gaussian。
+这部分正则项的实现方法是：新增加一部分网络Q，Q是将D前面的提取特征层重用，最后改为输出对c的条件概率的层。Q的作用是生成上文公式中的$Q(c|x)$，对于c取离散值的通过最后一层softmax得到，c取连续值的生成factored Gaussian模型系数确定相应概率。
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{./img/17.png}
@@ -469,18 +548,19 @@ $$I(c;G(z,c))\approx \mathbb{E}_{c\sim P(c), x\sim G(z,c)}[\log Q(c|x)] + H(c)$$
 GAN可以看成是找博弈的Nash equilibrium，但是并没有什么算法适合这种高维连续的参数空间。通过梯度下降不能保证博弈的收敛性，比如loss为xy，两边都会在正负两边循环而不能收敛到(0,0)。
 文中介绍几个heuristic的方法缓解这个问题。
  \subparagraph{feature matching}
-优化G只看结果偶然性较大，更精细一点是比较生成样本和真实样本在D中某个中间层的特征表示。令f为D到这个中间层的映射。
+优化G只通过最后真假的判断一个值来优化偶然性较大，更精细一点是比较生成样本和真实样本在D中某个中间层的特征表示。令f为D到这个中间层的映射。
 $$J^{(G)}=||\mathbb{E}_{x\sim data}f(x)-\mathbb{E}_{x\sim noise}f(G(x))||^2_2$$
  \subparagraph{Minibatch discrimination}
 其实是一种层将$n\times A$的中间层映射为$n\times B$且将相互之间差异信息糅杂进去。
 具体做法是用$A\times B \times C$的权值矩阵去乘，$out_{n,b}=\sum\limits_{i=1}^N e^{-||(in_iT)_b - (in_nT)_b||_1}$
 事实证明这个不影响D的分类效果。
  \subparagraph{Historical averaging}
-加正则与历史平均参数值的差$||\theta - \frac{1}{t}\sum \theta[i]||$。
+增加正则项——与历史平均参数值的差$||\theta - \frac{1}{t}\sum \theta[i]||$。
  \subparagraph{One-sided label smoothing}
-用0.1、0.9代替0、1。避免在截止区出现一系列问题。
- semi-supervised
-K+1类，其中1类代表fake。分两段分别学习。
+用0.1、0.9代替0、1。避免某些单元一直处于截止区，模型容量降低等一系列问题。
+ \subparagraph{semi-supervised}
+这里重复提及了\cite{DBLP:journals/corr/Odena16a}的做法。将判别器的输出分为K+1类，其中1类代表fake。
+其他同标准的GAN类似，这样最后得到的判别器能够分类，在数据量不大的时候效果较好。
  \subparagraph{Inception Score}
 $$e^{\mathbb{E}_xD_{KL}(p(y|x)||p(y))}$$
 x为生成样本，y为类别。
@@ -502,18 +582,20 @@ x为生成样本，y为类别。
 
 前者之前是通过增加判别器种类实现的，后者在AC-GAN中是通过classifier的loss实现的。
 
-本文将generator、classifier、discriminator三者更紧密的结合在一起，判别器接受sample、label对判别是否真实，而这中sample、label对可能是真实sample+classifier生成的或者generator根据label生成的（本文中generator是conditional的）。最后加上真实数据和标签训练classifer的loss。
+本文将generator、classifier、discriminator三者更紧密的结合在一起，判别器接受(sample、label)判别是否真实，而fake的样本的sample、label可能是真实sample+classifier生成的或者generator根据label生成的（本文中generator是conditional的）。最后加上真实数据和标签训练classifer的loss。
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{./img/32.png}
 \caption{Triple GAN}
 \label{fig:32}
 \end{figure}
+优化目标：
+
 \begin{multline}
 \min\limits_{C,G}\max\limits_D E_{(x,y)\sim p(x,y)}[\log D(x,y) - \log p_c(y|x)] +\\(1-\alpha)E_{y\sim p(y),z\sim p(z)}[\log(1-D(G(y,z), y))] + \alpha E_{x\sim p(x),y\sim p_c(y|x)}[\log (1 - D(x,y))]\nonumber
 \end{multline}
 \subsubsection{Good Semi-supervised Learning That Requires a Bad GAN\cite{DBLP:journals/corr/DaiYYCS17}}
-kimi的一篇文章，他发现之前直接在D加入分成N类的方法理论上有很大问题。设想如果是完美的生成器，那么D将无法确定如何究竟应该分在K+1类还是生成的类别。事实上，GAN做半监督之所以有用是因为会生成一些真实分布不同mode之间的类别，从而让分类器将这些分辨开，使得这中间低密度区域两边的分类更加准确。
+杨植麟学长的一篇文章，他发现之前直接在D加入分成N类的方法理论上有很大问题。设想如果是完美的生成器，那么D将无法确定如何究竟应该分在K+1类还是生成的类别。事实上，GAN做半监督之所以有用是因为会生成一些真实分布不同mode之间的类别，从而让分类器将这些分辨开，使得这中间低密度区域两边的分类更加准确。
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{./img/33.png}
@@ -560,6 +642,8 @@ $$
 使用GAN提高图像的分辨率，就是用conditional GAN生成高分辨率图像。
 loss分为3部分，一部分是跟原始图像的MSE，另一部分是GAN的loss，还有一个total variation正则项。
 G和D都是层数不太多的ResNet。
+
+这篇文章在方法上没什么创新，但是利用GAN产生真实感图形的特点提高图像的分辨率。但是GAN为了让图像尽量逼真，加入了很多没有充分根据的信息，因此与原图像可能差别较大，导致量化指标并不好。
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{./img/23.png}
@@ -617,7 +701,11 @@ D_\phi(Y_{1:t}),& if \ \ t=T\\
 
 毕竟是一篇应用的文章，想法很简单，就是conditional GAN，输入棋盘状态，输出下一步，然后判别是不是特定棋风的下法。\ref{fig:40}
 
-但是由于真实样本不够，在某些情况出现的时候必须得到一个不错的下法，因此G加入另一个loss项，用log似然保证预测的下法尽量接近大师棋谱中的下法、远离随机下法。
+但是由于真实样本不够，在某些情况出现的时候必须得到一个不错的下法，文章要求保证预测的下法尽量接近大师棋谱中的下法、远离随机下法。下面讨论这个loss：
+
+G是一个神经网络，接受一个棋盘信息输出一个估价函数，表示黑棋的优势程度。其中x是原棋盘，y是走后的棋盘，r是随机走后的棋盘，p是根据黑或白产生不同符号的函数。
+$$\sum\limits_{i = 1}^{i batchsize} [\log(\sigma(G(x_G^{(i)}) - G(y_G^{(i)}))) + \log(\sigma(G(y_G^{(i)}) - G(x_G^{(i)})))
++ \log(\sigma(p_i(G(x_G^{(i)}) - G(r_G^{(i)}))))]$$
 \subsection{SEGAN: Speech Enhancement Generative Adversarial Network\cite{DBLP:journals/corr/PascualBS17}}
 \begin{figure}
 \centering
@@ -634,7 +722,9 @@ D_\phi(Y_{1:t}),& if \ \ t=T\\
 \end{figure}
 这篇文章将GAN用于音频处理上，通过生成网络G除去噪音。对于信号的处理使用了一个encoder-decoder的结构，如\ref{fig:43}。
 
-训练使用了Conditional GAN的方法，如\ref{fig:42}。
+训练使用了Conditional GAN的方法，如\ref{fig:42}。损失函数即
+$$\min\limits_G\max\limits_D V(D,G)=\mathbb{E}_{x\sim p_{data}(x)}\log D(x) 
++ \mathbb{E}_{z\sim p_z(z)}[\log (1-D(G(z)))]$$
 \section{强化学习}
 \subsection{Playing Atari with Deep Reinforcement Learning\cite{DBLP:journals/corr/MnihKSGAWR13}}
 \subparagraph{Question}
@@ -686,7 +776,7 @@ Q的输入有$\phi(s)、a$，二者很难直接并列输入，最后采取了根
 
 （感觉不太符合题意，毕竟并不是每个action都是最优action的无偏估计，但是道理是这样的）
 
-如何解决，将Nature DQN target network选取最大的是按照select network选取的……反正效果不错。
+如何解决，将Nature DQN target network选取最大的是按照select network选取的，这么做的原因主要是实验效果不错。
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{./img/28.png}
@@ -703,10 +793,10 @@ Q的输入有$\phi(s)、a$，二者很难直接并列输入，最后采取了根
 \includegraphics[width=0.8\textwidth]{./img/29.png}
 \caption{Dueling DQN图解}
 \label{fig:29}
-\end{figure}将输入图像经过卷积处理之后，分成两部分，一部分计算出当前这个状态的价值，另一部分计算执行action的价值。
-$$Q(s,a;\theta,\alpha,\beta)=V(s,\theta, \alpha) + A(s,a,\beta)$$
-注意要归一，否则两部分相对规模不能确定。
-$$Q(s,a;\theta,\alpha,\beta)=V(s,\theta, \alpha) + (A(s,a,\beta) - \max A(s,a,\beta))$$减去最大值也可换成平均值。
+\end{figure}将输入图像经过卷积处理之后，分成两部分，一部分计算出当前这个状态的价值，另一部分计算执行action的价值。模型如图\ref{fig:29}所示。
+$$Q(s,a;\theta,\alpha,\beta)=V(s,\theta, \alpha) + A(s,a,\theta,\beta)$$
+其中s为状态，a是输入的执行动作，$\theta$是Q network前半部分的参数，$\alpha, \beta$是后半部分计算状态价值和动作价值两部分的参数。注意要归一，否则两部分相对规模不能确定。
+$$Q(s,a;\theta,\alpha,\beta)=V(s,\theta, \alpha) + (A(s,a,\theta,\beta) - \max A(s,a,\theta,\beta))$$减去最大值也可换成平均值，只要是一种归一即可。
 
 
 \bibliographystyle{plainnat}
